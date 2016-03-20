@@ -994,10 +994,6 @@ config EXT_ANC
 	 on Sensor DSP.
 
 config STATE_NOTIFIER
-	bool "State Notifier"
-	default n
-	help
-	  A unified display state notifier for kernel drivers for easy porting
-	  between different devices.
+    bool "State Notifier"
 
 source "drivers/soc/qcom/memshare/Kconfig"

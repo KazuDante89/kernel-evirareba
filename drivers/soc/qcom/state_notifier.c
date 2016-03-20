@@ -1,8 +1,7 @@
 /*
  * State Notifier Driver
  *
- * Copyright (c) 2013-2017, Pranav Vashi <neobuddy89@gmail.com>
- *           (c) 2017, Joe Maples <joe@frap129.org>
+ * Copyright (c) 2013-2018, Pranav Vashi <neobuddy89@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -14,7 +13,7 @@
 #include <linux/module.h>
 #include <linux/state_notifier.h>
 
-#define DEFAULT_SUSPEND_DEFER_TIME 	1
+#define DEFAULT_SUSPEND_DEFER_TIME 	10
 #define STATE_NOTIFIER			"state_notifier"
 
 /*
@@ -29,6 +28,8 @@ do {				\
 		pr_info(msg);	\
 } while (0)
 
+static bool enabled = true;
+module_param_named(enabled, enabled, bool, 0664);
 static unsigned int suspend_defer_time = DEFAULT_SUSPEND_DEFER_TIME;
 module_param_named(suspend_defer_time, suspend_defer_time, uint, 0664);
 static struct delayed_work suspend_work;
@@ -90,7 +91,7 @@ static void _resume_work(struct work_struct *work)
 void state_suspend(void)
 {
 	dprintk("%s: suspend called.\n", STATE_NOTIFIER);
-	if (state_suspended || suspend_in_progress)
+	if (state_suspended || suspend_in_progress || !enabled)
 		return;
 
 	suspend_in_progress = true;
