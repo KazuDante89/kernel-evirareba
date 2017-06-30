@@ -21,17 +21,7 @@ unsigned int sysctl_sched_cfs_boost __read_mostly;
 extern struct reciprocal_value schedtune_spc_rdiv;
 struct target_nrg schedtune_target_nrg;
 
-#ifdef CONFIG_DYNAMIC_STUNE_BOOST
-#define DYNAMIC_BOOST_SLOTS_COUNT 5
-static DEFINE_MUTEX(boost_slot_mutex);
-static DEFINE_MUTEX(stune_boost_mutex);
-static struct schedtune *getSchedtune(char *st_name);
-static int dynamic_boost(struct schedtune *st, int boost);
-struct boost_slot {
-	struct list_head list;
-	int idx;
-};
-#endif /* CONFIG_DYNAMIC_STUNE_BOOST */
+
 
 #ifdef CONFIG_DYNAMIC_STUNE_BOOST
 #define DYNAMIC_BOOST_SLOTS_COUNT 5
@@ -1151,6 +1141,16 @@ int do_stune_boost(char *st_name, int boost, int *slot)
 		return -EINVAL;
 
 	return _do_stune_boost(st, boost, slot);
+}
+
+int do_prefer_idle(char *st_name, u64 prefer_idle)
+{
+	struct schedtune *st = getSchedtune(st_name);
+
+	if (!st)
+		return -EINVAL;
+
+	return prefer_idle_write(&st->css, NULL, prefer_idle);
 }
 
 #endif /* CONFIG_DYNAMIC_STUNE_BOOST */
